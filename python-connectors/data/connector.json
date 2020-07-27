@@ -65,10 +65,10 @@
             ]
         },
         {
-            "name": "part",
+            "name": "videos_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['playlists','videos'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['videos'].indexOf(model.edge_name) >= 0",
             "defaultValue": [],
             "selectChoices": [
                 {
@@ -98,7 +98,40 @@
             ]
         },
         {
-            "name": "part",
+            "name": "playlists_part",
+            "label": "Parts",
+            "type": "MULTISELECT",
+            "visibilityCondition": "['playlists'].indexOf(model.edge_name) >= 0",
+            "defaultValue": [],
+            "selectChoices": [
+                {
+                    "value": "contentDetails",
+                    "label": "Content details"
+                },
+                {
+                    "value": "id",
+                    "label": "ID"
+                },
+                {
+                    "value": "localizations",
+                    "label": "Localizations"
+                },
+                {
+                    "value": "player",
+                    "label": "Player"
+                },
+                {
+                    "value": "snippet",
+                    "label": "Snippet"
+                },
+                {
+                    "value": "status",
+                    "label": "Status"
+                }
+            ]
+        },
+        {
+            "name": "channels_part",
             "label": "Parts",
             "type": "MULTISELECT",
             "visibilityCondition": "model.edge_name == 'channels'",
@@ -151,7 +184,7 @@
             ]
         },
         {
-            "name": "part",
+            "name": "comments_part",
             "label": "Parts",
             "type": "MULTISELECT",
             "visibilityCondition": "['comments'].indexOf(model.edge_name) >= 0",
@@ -168,7 +201,7 @@
             ]
         },
         {
-            "name": "part",
+            "name": "commentThreads_part",
             "label": "Parts",
             "type": "MULTISELECT",
             "visibilityCondition": "['commentThreads'].indexOf(model.edge_name) >= 0",
@@ -189,7 +222,7 @@
             ]
         },
         {
-            "name": "part",
+            "name": "subscriptions_part",
             "label": "Parts",
             "type": "MULTISELECT",
             "visibilityCondition": "['subscriptions'].indexOf(model.edge_name) >= 0",

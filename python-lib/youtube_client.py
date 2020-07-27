@@ -20,6 +20,7 @@ VIDEO_ID = "{video_id}"
 COMMENT_ID = "{comment_id}"
 PLAYLIST_ID = "{playlist_id}"
 SUBSCRIPTION_ID = "{subscription_id}"
+ITEM_ID_EQUIVALENT = "item_id_equivalent"
 
 youtube_api = {
     DEFAULT_DESCRIPTOR: {
@@ -37,14 +38,22 @@ youtube_api = {
             QUERY_STRING: {
                 "channelId": CHANNEL_ID,
                 "id": PLAYLIST_ID,
-                "part": PART
+                "part": "{playlists_part}"
+            },
+            COLUMN_EXPANDING: ["contentDetails", "player", "snippet"]
+        },
+        "playlists_channelid": {
+            RESOURCE: "playlists",
+            QUERY_STRING: {
+                "channelId": CHANNEL_ID,
+                "part": "{playlists_part}"
             },
             COLUMN_EXPANDING: ["contentDetails", "player", "snippet"]
         },
         "videos": {
             QUERY_STRING: {
                 "id": VIDEO_ID,
-                "part": PART
+                "part": "{videos_part}"
             },
             RECIPE_INPUT: "id",
             COLUMN_EXPANDING: ["contentDetails", "player", "snippet", "status"]
@@ -53,41 +62,43 @@ youtube_api = {
             QUERY_STRING: {
                 "categoryId": "{category_id}",
                 "id": CHANNEL_ID,
-                "part": PART,
+                "part": "{channels_part}",
                 "forUsername": "{for_user_name}"
             },
             COLUMN_EXPANDING: ["brandingSettings", "contentDetails", "status", "topicDetails", "statistics", "contentOwnerDetails", "snippet"]
         },
         "comments": {
             QUERY_STRING: {
-                "part": PART,
+                "part": "{comments_part}",
                 "id": COMMENT_ID,
                 "parentId": "{parent_id}"
             },
+            ITEM_ID_EQUIVALENT: "playlist_id",
             RECIPE_INPUT: "id",
             COLUMN_EXPANDING: ["snippet"]
         },
         "commentThreads": {
             QUERY_STRING: {
-                "part": PART,
+                "part": "{commentThreads_part}",
                 "videoId": VIDEO_ID,
                 "channelId": CHANNEL_ID,
                 "allThreadsRelatedToChannelId": "{allThreadsRelatedToChannelId}",
                 "id": COMMENT_ID
             },
+            ITEM_ID_EQUIVALENT: VIDEO_ID,
             COLUMN_EXPANDING: ["snippet", "replies"],
             COLUMN_UNESCAPING: ["snippet_topLevelComment_snippet_textDisplay", "snippet_topLevelComment_snippet_textOriginal"]
         },
         "playlistItems": {
             QUERY_STRING: {
-                "part": PART,
+                "part": "{playlistItems_part}",
                 "playlistId": PLAYLIST_ID
             },
             COLUMN_EXPANDING: ["contentDetails", "snippet", "status"],
         },
         "subscriptions": {
             QUERY_STRING: {
-                "part": PART,  # contentDetails id snippet subscriberSnippet
+                "part": "{subscriptions_part}",  # contentDetails id snippet subscriberSnippet
                 "channelId": CHANNEL_ID,
                 "id": SUBSCRIPTION_ID,
                 "mine": "",
@@ -99,7 +110,7 @@ youtube_api = {
         },
         "dss_recipe": {
             QUERY_STRING: {
-                "part": PART,
+                "part": "{dss_recipe_part}",
                 "id": "{id}"
             }
         }
@@ -138,7 +149,7 @@ class YoutubeClient(object):
                 extracted[kwarg] = kwargs[kwarg]
         return extracted
 
-    def get_edge(self, **kwargs):
+    def get_edge(self, raise_exception=True, **kwargs):
         edge_name = kwargs.get("edge_name", None)
         edge_descriptor = self.get_edge_descriptor(edge_name)
         self.start_session(edge_descriptor)
@@ -146,10 +157,25 @@ class YoutubeClient(object):
         url = self.get_edge_url(edge_descriptor, **kwargs)
         headers = self.get_headers()
         response = requests.get(url, params=params, headers=headers)
-        self.assert_valid_response(response, edge_descriptor, **kwargs)
-        json_response = response.json()
+        if raise_exception:
+            self.assert_valid_response(response, edge_descriptor, **kwargs)
+            json_response = response.json()
+        else:
+            if response.status_code < 400:
+                json_response = response.json()
+            else:
+                error_message = self.extract_error_message(response, edge_descriptor, **kwargs)
+                json_response = {"items": [{"error": error_message}]}
         self.store_next_page(url, headers, params, json_response)
         return json_response.get("items", [])
+
+    def response_to_json(self, response, raise_exception=True):
+        content_type = response.headers.get('content-type', '')
+        if "application/json" in content_type.lower():
+            json_response = response.json()
+            return json_response
+        else:
+            return None
 
     def start_recipe_session(self, edge_name):
         self.edge_descriptor = self.get_edge_descriptor(edge_name)
@@ -166,6 +192,10 @@ class YoutubeClient(object):
         if self.oauth_access_token is not None:
             headers["Authorization"] = "Bearer {}".format(self.oauth_access_token)
         return headers
+
+    def get_item_id_equivalent(self, edge_name):
+        edge_descriptor = self.get_edge_descriptor(edge_name)
+        return edge_descriptor.get(ITEM_ID_EQUIVALENT, "item_id")
 
     def get_edge_url(self, edge_descriptor, **kwargs):
         base_url_template = self.extract_from_edge_descriptor(API_URL, edge_descriptor)
@@ -188,12 +218,16 @@ class YoutubeClient(object):
 
     def assert_valid_response(self, response, edge_descriptor, **kwargs):
         if response.status_code >= 400:
-            response_error = self.get_error(response)
-            error_templates = self.extract_from_edge_descriptor(ON_RETURN, edge_descriptor)
-            error_template = error_templates.get(response.status_code, "Error: {}".format(response_error))
-            error_message = self.format_template(error_template, **kwargs)
+            error_message = self.extract_error_message(response, edge_descriptor, **kwargs)
             raise Exception(error_message)
         return True
+
+    def extract_error_message(self, response, edge_descriptor, **kwargs):
+        response_error = self.get_error(response)
+        error_templates = self.extract_from_edge_descriptor(ON_RETURN, edge_descriptor)
+        error_template = error_templates.get(response.status_code, "Error: {}".format(response_error))
+        error_message = self.format_template(error_template, **kwargs)
+        return error_message
 
     def format_data(self, data):
         for key in self.formating:

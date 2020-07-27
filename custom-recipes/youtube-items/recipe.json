@@ -89,10 +89,10 @@
             ]
         },
         {
-            "name": "part",
+            "name": "playlists_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['playlists','videos'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['playlists'].indexOf(model.edge_name) >= 0",
             "selectChoices": [
                 {
                     "value": "contentDetails",
@@ -121,7 +121,39 @@
             ]
         },
         {
-            "name": "part",
+            "name": "videos_part",
+            "label": "Parts",
+            "type": "MULTISELECT",
+            "visibilityCondition": "['videos'].indexOf(model.edge_name) >= 0",
+            "selectChoices": [
+                {
+                    "value": "contentDetails",
+                    "label": "Content details"
+                },
+                {
+                    "value": "id",
+                    "label": "ID"
+                },
+                {
+                    "value": "localizations",
+                    "label": "Localizations"
+                },
+                {
+                    "value": "player",
+                    "label": "Player"
+                },
+                {
+                    "value": "snippet",
+                    "label": "Snippet"
+                },
+                {
+                    "value": "status",
+                    "label": "Status"
+                }
+            ]
+        },
+        {
+            "name": "channels_part",
             "label": "Parts",
             "type": "MULTISELECT",
             "visibilityCondition": "model.edge_name == 'channels'",
@@ -173,7 +205,7 @@
             ]
         },
         {
-            "name": "part",
+            "name": "comments_part",
             "label": "Parts",
             "type": "MULTISELECT",
             "visibilityCondition": "['comments'].indexOf(model.edge_name) >= 0",
@@ -189,7 +221,7 @@
             ]
         },
         {
-            "name": "part",
+            "name": "commentThreads_part",
             "label": "Parts",
             "type": "MULTISELECT",
             "visibilityCondition": "['commentThreads'].indexOf(model.edge_name) >= 0",
@@ -209,7 +241,7 @@
             ]
         },
         {
-            "name": "part",
+            "name": "subscriptions_part",
             "label": "Parts",
             "type": "MULTISELECT",
             "visibilityCondition": "['subscriptions'].indexOf(model.edge_name) >= 0",
@@ -234,56 +266,69 @@
         },
         {
             "name": "id_type",
-            "label": "ID Type",
-            "type": "MULTISELECT",
-            "defaultValue": "category_id",
-            "visibilityCondition": "['channels'].indexOf(model.edge_name) >= 0",
-            "selectChoices": [
-                {
-                    "value": "category_id",
-                    "label": "Category ID"
-                },
-                {
-                    "value": "for_user_name",
-                    "label": "For username"
-                }
-            ]
-        },
-        {
-            "name": "id_type",
-            "label": "ID Type",
-            "type": "MULTISELECT",
-            "defaultValue": "category_id",
-            "visibilityCondition": "['comments'].indexOf(model.edge_name) >= 0",
+            "label": "ID type",
+            "type": "SELECT",
+            "visibilityCondition": "model.edge_name == 'comments'",
             "selectChoices": [
                 {
                     "value": "comment_id",
                     "label": "Comment ID"
                 },
                 {
-                    "value": "parent_id",
+                    "value": "parentId",
                     "label": "Parent ID"
                 }
             ]
         },
         {
             "name": "id_type",
-            "label": "ID Type",
-            "type": "MULTISELECT",
-            "defaultValue": "category_id",
-            "visibilityCondition": "['commentThreads'].indexOf(model.edge_name) >= 0",
+            "label": "ID type",
+            "type": "SELECT",
+            "visibilityCondition": "model.edge_name == 'playlists'",
             "selectChoices": [
                 {
-                    "value": "comment_id",
-                    "label": "Comment ID"
+                    "value": "channel_id",
+                    "label": "Channel ID"
                 },
+                {
+                    "value": "playlist_id",
+                    "label": "Playlist ID"
+                }
+            ]
+        },
+        {
+            "name": "id_type",
+            "label": "ID type",
+            "type": "SELECT",
+            "visibilityCondition": "model.edge_name == 'commentThreads'",
+            "selectChoices": [
                 {
                     "value": "video_id",
                     "label": "Video ID"
                 },
                 {
                     "value": "allThreadsRelatedToChannelId",
-                    "label": "All threads related to channel ID"
+                    "label": "All related to channel ID"
+                },
+                {
+                    "value": "comment_id",
+                    "label": "Comment ID"
+                },
+                {
+                    "value": "channel_id",
+                    "label": "channel ID"
+                }
+            ]
+        },
+        {
+            "name": "id_type",
+            "label": "ID type",
+            "type": "SELECT",
+            "visibilityCondition": "model.edge_name == 'videos'",
+            "selectChoices": [
+                {
+                    "value": "video_id",
+                    "label": "Video ID"
                 }
             ]
         },
@@ -291,19 +336,10 @@
             "name": "id_column_name",
             "label": "ID's column name",
             "type": "STRING",
-            "description": "Name of the column containing the playlist IDs to process",
+            "description": "Name of the column containing the IDs to process",
             "defaultValue": "",
             "mandatory": true,
-            "visibilityCondition": "model.edge_name == 'playlists'"
-        },
-        {
-            "name": "id_column_name",
-            "label": "ID's column name",
-            "type": "STRING",
-            "description": "Name of the column containing the videos IDs to process",
-            "defaultValue": "",
-            "mandatory": true,
-            "visibilityCondition": "['videos', 'comments', 'subscriptions'].indexOf(model.edge_name) >= 0"
+            "visibilityCondition": "['commentThreads', 'channels', 'playlists', 'videos', 'comments', 'subscriptions'].indexOf(model.edge_name) >= 0"
         }
     ],
     "resourceKeys": []
