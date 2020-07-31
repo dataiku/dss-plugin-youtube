@@ -5,7 +5,7 @@
         "label": "Youtube",
         "description": "",
         "author": "Dataiku (Alex Bourret)",
-        "icon": "icon-play",
+        "icon": "icon-youtube-play",
         "tags": ["Connector", "Recipe", "Cloud"],
         "url": "https://www.dataiku.com/product/plugins/youtube/",
         "licenseInfo": "Apache Software License"

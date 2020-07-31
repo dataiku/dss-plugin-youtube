@@ -2,7 +2,7 @@
     "meta" : {
         "label": "Youtube API key",
         "description": "",
-        "icon": "icon-play"
+        "icon": "icon-youtube-play"
     },
 
     "defaultDefinableInline": true,

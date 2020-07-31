@@ -2,7 +2,7 @@
     "meta": {
         "label": "Google Single Sign On",
         "description": "",
-        "icon": "icon-play"
+        "icon": "icon-youtube-play"
     },
     "defaultDefinableInline": true,
     "defaultDefinableAtProjectLevel": true,

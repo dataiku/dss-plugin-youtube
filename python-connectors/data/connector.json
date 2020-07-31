@@ -2,7 +2,7 @@
     "meta" : {
         "label": "Data API",
         "description": "Access Youtube Data API",
-        "icon": "icon-play"
+        "icon": "icon-youtube-play"
     },
     "readable": true,
     "writable": false,

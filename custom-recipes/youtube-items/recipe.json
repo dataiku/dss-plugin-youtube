@@ -2,7 +2,8 @@
     "meta": {
         "label": "Youtube recipe",
         "description": "Retrieve items from Youtube data API",
-        "icon": "icon-play"
+        "icon": "icon-youtube-play",
+        "iconColor": "#FF0000"
     },
     "kind": "PYTHON",
     "inputRoles": [
