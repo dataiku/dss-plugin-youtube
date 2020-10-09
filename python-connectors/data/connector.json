@@ -38,7 +38,7 @@
             "visibilityCondition": "model.access_type == 'oauth_credentials'"
         },
         {
-            "name": "edge_name",
+            "name": "endpoint",
             "label": "Item type",
             "type": "SELECT",
             "selectChoices": [
@@ -68,7 +68,7 @@
             "name": "videos_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['videos'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['videos'].indexOf(model.endpoint) >= 0",
             "defaultValue": [],
             "selectChoices": [
                 {
@@ -101,7 +101,7 @@
             "name": "playlists_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['playlists'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['playlists'].indexOf(model.endpoint) >= 0",
             "defaultValue": [],
             "selectChoices": [
                 {
@@ -134,7 +134,7 @@
             "name": "channels_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "model.edge_name == 'channels'",
+            "visibilityCondition": "model.endpoint == 'channels'",
             "defaultValue": [],
             "selectChoices": [
                 {
@@ -187,7 +187,7 @@
             "name": "comments_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['comments'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['comments'].indexOf(model.endpoint) >= 0",
             "defaultValue": [],
             "selectChoices": [
                 {
@@ -204,7 +204,7 @@
             "name": "commentThreads_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['commentThreads'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['commentThreads'].indexOf(model.endpoint) >= 0",
             "defaultValue": [],
             "selectChoices": [
                 {
@@ -225,7 +225,7 @@
             "name": "subscriptions_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['subscriptions'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['subscriptions'].indexOf(model.endpoint) >= 0",
             "defaultValue": [],
             "selectChoices": [
                 {
@@ -252,7 +252,7 @@
             "type": "STRING",
             "description": "",
             "mandatory": false,
-            "visibilityCondition": "['playlists', 'channels', 'commentThreads', 'subscriptions'].indexOf(model.edge_name) >= 0"
+            "visibilityCondition": "['playlists', 'channels', 'commentThreads', 'subscriptions'].indexOf(model.endpoint) >= 0"
         },
         {
             "name": "video_id",
@@ -260,7 +260,7 @@
             "type": "STRING",
             "description": "",
             "mandatory": false,
-            "visibilityCondition": "['videos', 'commentThreads'].indexOf(model.edge_name) >= 0"
+            "visibilityCondition": "['videos', 'commentThreads'].indexOf(model.endpoint) >= 0"
         },
         {
             "name": "category_id",
@@ -269,7 +269,7 @@
             "type": "STRING",
             "description": "",
             "mandatory": false,
-            "visibilityCondition": "model.edge_name == 'channels'"
+            "visibilityCondition": "model.endpoint == 'channels'"
         },
         {
             "name": "for_user_name",
@@ -277,7 +277,7 @@
             "type": "STRING",
             "description": "",
             "mandatory": false,
-            "visibilityCondition": "model.edge_name == 'channels'"
+            "visibilityCondition": "model.endpoint == 'channels'"
         },
         {
             "name": "managed_by_me",
@@ -285,7 +285,7 @@
             "type": "BOOLEAN",
             "description": "",
             "mandatory": false,
-            "visibilityCondition": "model.edge_name == 'channels'"
+            "visibilityCondition": "model.endpoint == 'channels'"
         },
         {
             "name": "comment_id",
@@ -294,7 +294,7 @@
             "description": "",
             "defaultValue": "",
             "mandatory": false,
-            "visibilityCondition": "['comments', 'commentThreads'].indexOf(model.edge_name) >= 0"
+            "visibilityCondition": "['comments', 'commentThreads'].indexOf(model.endpoint) >= 0"
         },
         {
             "name": "parent_id",
@@ -303,7 +303,7 @@
             "description": "",
             "defaultValue": "",
             "mandatory": false,
-            "visibilityCondition": "model.edge_name == 'comments'"
+            "visibilityCondition": "model.endpoint == 'comments'"
         },
         {
             "name": "allThreadsRelatedToChannelId",
@@ -312,7 +312,7 @@
             "description": "",
             "defaultValue": "",
             "mandatory": false,
-            "visibilityCondition": "['commentThreads'].indexOf(model.edge_name) >= 0"
+            "visibilityCondition": "['commentThreads'].indexOf(model.endpoint) >= 0"
         },
         {
             "name": "subscription_id",
@@ -321,7 +321,7 @@
             "description": "",
             "defaultValue": "",
             "mandatory": false,
-            "visibilityCondition": "['subscriptions'].indexOf(model.edge_name) >= 0"
+            "visibilityCondition": "['subscriptions'].indexOf(model.endpoint) >= 0"
         }
     ]
 }

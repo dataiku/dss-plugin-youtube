@@ -59,7 +59,7 @@
             "visibilityCondition": "model.access_type == 'oauth_credentials'"
         },
         {
-            "name": "edge_name",
+            "name": "endpoint",
             "label": "Item type",
             "type": "SELECT",
             "selectChoices": [
@@ -93,7 +93,7 @@
             "name": "playlists_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['playlists'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['playlists'].indexOf(model.endpoint) >= 0",
             "selectChoices": [
                 {
                     "value": "contentDetails",
@@ -125,7 +125,7 @@
             "name": "videos_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['videos'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['videos'].indexOf(model.endpoint) >= 0",
             "selectChoices": [
                 {
                     "value": "contentDetails",
@@ -157,7 +157,7 @@
             "name": "channels_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "model.edge_name == 'channels'",
+            "visibilityCondition": "model.endpoint == 'channels'",
             "selectChoices": [
                 {
                     "value": "auditDetails",
@@ -209,7 +209,7 @@
             "name": "comments_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['comments'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['comments'].indexOf(model.endpoint) >= 0",
             "selectChoices": [
                 {
                     "value": "id",
@@ -225,7 +225,7 @@
             "name": "commentThreads_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['commentThreads'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['commentThreads'].indexOf(model.endpoint) >= 0",
             "selectChoices": [
                 {
                     "value": "id",
@@ -245,7 +245,7 @@
             "name": "subscriptions_part",
             "label": "Parts",
             "type": "MULTISELECT",
-            "visibilityCondition": "['subscriptions'].indexOf(model.edge_name) >= 0",
+            "visibilityCondition": "['subscriptions'].indexOf(model.endpoint) >= 0",
             "selectChoices": [
                 {
                     "value": "contentDetails",
@@ -269,7 +269,7 @@
             "name": "id_type",
             "label": "ID type",
             "type": "SELECT",
-            "visibilityCondition": "model.edge_name == 'comments'",
+            "visibilityCondition": "model.endpoint == 'comments'",
             "selectChoices": [
                 {
                     "value": "comment_id",
@@ -285,7 +285,7 @@
             "name": "id_type",
             "label": "ID type",
             "type": "SELECT",
-            "visibilityCondition": "model.edge_name == 'playlists'",
+            "visibilityCondition": "model.endpoint == 'playlists'",
             "selectChoices": [
                 {
                     "value": "channel_id",
@@ -301,7 +301,7 @@
             "name": "id_type",
             "label": "ID type",
             "type": "SELECT",
-            "visibilityCondition": "model.edge_name == 'commentThreads'",
+            "visibilityCondition": "model.endpoint == 'commentThreads'",
             "selectChoices": [
                 {
                     "value": "video_id",
@@ -325,7 +325,7 @@
             "name": "id_type",
             "label": "ID type",
             "type": "SELECT",
-            "visibilityCondition": "model.edge_name == 'videos'",
+            "visibilityCondition": "model.endpoint == 'videos'",
             "selectChoices": [
                 {
                     "value": "video_id",
@@ -340,7 +340,7 @@
             "description": "Name of the column containing the IDs to process",
             "defaultValue": "",
             "mandatory": true,
-            "visibilityCondition": "['commentThreads', 'channels', 'playlists', 'videos', 'comments', 'subscriptions'].indexOf(model.edge_name) >= 0"
+            "visibilityCondition": "['commentThreads', 'channels', 'playlists', 'videos', 'comments', 'subscriptions'].indexOf(model.endpoint) >= 0"
         }
     ],
     "resourceKeys": []

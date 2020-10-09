@@ -14,9 +14,9 @@ input_A_names = get_input_names_for_role('input_A_role')
 id_column_name = get_recipe_config()['id_column_name']
 access_type = get_recipe_config()['access_type']
 connection_details = get_recipe_config()[access_type]
-edge_name = get_recipe_config()['edge_name']
+endpoint = get_recipe_config()['endpoint']
 id_type = get_recipe_config().get('id_type', "")
-part_name = edge_name + "_part"
+part_name = endpoint + "_part"
 part = ",".join(get_recipe_config()[part_name])
 access_token = connection_details.get("youtube_credentials")
 client = YoutubeClient(connection_details)
@@ -26,16 +26,16 @@ id_list_df = id_list.get_dataframe()
 
 results = []
 args = {
-    "edge_name": edge_name,
+    "endpoint": endpoint,
     part_name: part
 }
-item_id_equivalent = id_type if id_type != "" else client.get_item_id_equivalent(edge_name)
+item_id_equivalent = id_type if id_type != "" else client.get_item_id_equivalent(endpoint)
 for index, row in id_list_df.iterrows():
     id = row[id_column_name]
     #if row.isnull().values.any():
     #    continue
     args[item_id_equivalent] = id
-    data = client.get_edge(raise_exception=False, **args)
+    data = client.get_endpoint(raise_exception=False, **args)
     while len(data) > 0:
         for result in data:
             result = client.format_data(result)

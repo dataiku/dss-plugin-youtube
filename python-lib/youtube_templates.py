@@ -15,7 +15,7 @@ def youtube_recipe_runtime(parameter_id):
     id_column_name = get_recipe_config()['id_column_name']
     access_type = get_recipe_config()['access_type']
     connection_details = get_recipe_config()[access_type]
-    edge_name = get_recipe_config()['edge_name']
+    endpoint = get_recipe_config()['endpoint']
     part = ",".join(get_recipe_config()['part'])
     client = YoutubeClient(connection_details)
 
@@ -24,13 +24,13 @@ def youtube_recipe_runtime(parameter_id):
 
     results = []
     args = {
-        "edge_name": edge_name,
+        "endpoint": endpoint,
         "part": part
     }
 
     for index, row in id_list_df.iterrows():
         args[parameter_id] = row[id_column_name]  # Optimize this -> [id,id,id...]
-        data = client.get_edge(**args)
+        data = client.get_endpoint(**args)
         while len(data) > 0:
             for result in data:
                 result = client.format_data(result)

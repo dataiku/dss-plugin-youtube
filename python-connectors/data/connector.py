@@ -14,7 +14,7 @@ class YoutubeDataAPIConnector(Connector):
         self.access_token = self.connection_details.get("access_token", None)
         self.client = YoutubeClient(self.connection_details)
         self.part = ",".join(self.config.get("part", []))
-        self.edge_name = self.config.get("edge_name", None)
+        self.endpoint = self.config.get("endpoint", None)
         self.args = self.client.extract_args(**config)
 
     def get_read_schema(self):
@@ -24,7 +24,7 @@ class YoutubeDataAPIConnector(Connector):
 
     def generate_rows(self, dataset_schema=None, dataset_partitioning=None,
                       partition_id=None, records_limit=-1):
-        json_response = self.client.get_edge(**self.args)
+        json_response = self.client.get_endpoint(**self.args)
         while True:
             for item in json_response:
                 yield self.client.format_data(item)

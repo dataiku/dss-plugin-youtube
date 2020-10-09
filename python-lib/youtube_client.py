@@ -3,7 +3,7 @@ import copy
 import json
 
 DEFAULT_DESCRIPTOR = "default"
-EDGE_NAME = "edge_name"
+ENDPOINT = "endpoint"
 RESOURCE = "resource_name"
 API_URL = "api"
 ON_RETURN = "on_return"
@@ -24,17 +24,17 @@ ITEM_ID_EQUIVALENT = "item_id_equivalent"
 
 youtube_api = {
     DEFAULT_DESCRIPTOR: {
-        RESOURCE: "{edge_name}",
-        API_URL: "https://www.googleapis.com/youtube/v3/",  # {edge_name}?channelId={video_id}&key={api_key}&part={parts}
+        RESOURCE: "{endpoint}",
+        API_URL: "https://www.googleapis.com/youtube/v3/",  # {endpoint}?channelId={video_id}&key={api_key}&part={parts}
         ON_RETURN: {
             200: "data",
             401: "The user is not logged in",
             500: "Youtube Server Error"
         }
     },
-    "edge_name": {
+    ENDPOINT: {
         "playlists": {
-            RESOURCE: "{edge_name}",
+            RESOURCE: "{endpoint}",
             QUERY_STRING: {
                 "channelId": CHANNEL_ID,
                 "id": PLAYLIST_ID,
@@ -130,11 +130,11 @@ class YoutubeClient(object):
         self.expanding = None
         self.cleaning = None
 
-    def start_session(self, edge_descriptor):
-        self.formating = edge_descriptor.get(COLUMN_FORMATING, [])
-        self.expanding = edge_descriptor.get(COLUMN_EXPANDING, [])
-        self.unescaping = edge_descriptor.get(COLUMN_UNESCAPING, [])
-        self.cleaning = edge_descriptor.get(COLUMN_CLEANING, [])
+    def start_session(self, endpoint_descriptor):
+        self.formating = endpoint_descriptor.get(COLUMN_FORMATING, [])
+        self.expanding = endpoint_descriptor.get(COLUMN_EXPANDING, [])
+        self.unescaping = endpoint_descriptor.get(COLUMN_UNESCAPING, [])
+        self.cleaning = endpoint_descriptor.get(COLUMN_CLEANING, [])
         if self.formating == [] and self.expanding == [] and self.cleaning == []:
             self.format = self.return_data
         else:
@@ -149,22 +149,22 @@ class YoutubeClient(object):
                 extracted[kwarg] = kwargs[kwarg]
         return extracted
 
-    def get_edge(self, raise_exception=True, **kwargs):
-        edge_name = kwargs.get("edge_name", None)
-        edge_descriptor = self.get_edge_descriptor(edge_name)
-        self.start_session(edge_descriptor)
-        params = self.get_edge_params(edge_descriptor, **kwargs)
-        url = self.get_edge_url(edge_descriptor, **kwargs)
+    def get_endpoint(self, raise_exception=True, **kwargs):
+        endpoint = kwargs.get("endpoint", None)
+        endpoint_descriptor = self.get_endpoint_descriptor(endpoint)
+        self.start_session(endpoint_descriptor)
+        params = self.get_endpoint_params(endpoint_descriptor, **kwargs)
+        url = self.get_endpoint_url(endpoint_descriptor, **kwargs)
         headers = self.get_headers()
         response = requests.get(url, params=params, headers=headers)
         if raise_exception:
-            self.assert_valid_response(response, edge_descriptor, **kwargs)
+            self.assert_valid_response(response, endpoint_descriptor, **kwargs)
             json_response = response.json()
         else:
             if response.status_code < 400:
                 json_response = response.json()
             else:
-                error_message = self.extract_error_message(response, edge_descriptor, **kwargs)
+                error_message = self.extract_error_message(response, endpoint_descriptor, **kwargs)
                 json_response = {"items": [{"error": error_message}]}
         self.store_next_page(url, headers, params, json_response)
         return json_response.get("items", [])
@@ -177,15 +177,15 @@ class YoutubeClient(object):
         else:
             return None
 
-    def start_recipe_session(self, edge_name):
-        self.edge_descriptor = self.get_edge_descriptor(edge_name)
+    def start_recipe_session(self, endpoint):
+        self.endpoint_descriptor = self.get_endpoint_descriptor(endpoint)
 
-    def get_edge_from_recipe(self, **kwargs):
-        url = self.get_edge_url(self.edge_descriptor, **kwargs)
+    def get_endpoint_from_recipe(self, **kwargs):
+        url = self.get_endpoint_url(self.endpoint_descriptor, **kwargs)
         headers = self.get_headers()
-        params = self.get_edge_params(self.get_edge_descriptor("dss_recipe"), **kwargs)
+        params = self.get_endpoint_params(self.get_endpoint_descriptor("dss_recipe"), **kwargs)
         response = requests.get(url, params=params, headers=headers)
-        self.assert_valid_response(response, self.edge_descriptor, **kwargs)
+        self.assert_valid_response(response, self.endpoint_descriptor, **kwargs)
 
     def get_headers(self):
         headers = {}
@@ -193,19 +193,19 @@ class YoutubeClient(object):
             headers["Authorization"] = "Bearer {}".format(self.oauth_access_token)
         return headers
 
-    def get_item_id_equivalent(self, edge_name):
-        edge_descriptor = self.get_edge_descriptor(edge_name)
-        return edge_descriptor.get(ITEM_ID_EQUIVALENT, "item_id")
+    def get_item_id_equivalent(self, endpoint):
+        endpoint_descriptor = self.get_endpoint_descriptor(endpoint)
+        return endpoint_descriptor.get(ITEM_ID_EQUIVALENT, "item_id")
 
-    def get_edge_url(self, edge_descriptor, **kwargs):
-        base_url_template = self.extract_from_edge_descriptor(API_URL, edge_descriptor)
-        ressource_template = self.extract_from_edge_descriptor(RESOURCE, edge_descriptor)
+    def get_endpoint_url(self, endpoint_descriptor, **kwargs):
+        base_url_template = self.extract_from_endpoint_descriptor(API_URL, endpoint_descriptor)
+        ressource_template = self.extract_from_endpoint_descriptor(RESOURCE, endpoint_descriptor)
         base_url = self.format_template(base_url_template, **kwargs)
         ressource = self.format_template(ressource_template, **kwargs)
         return "{base_url}{ressource}".format(base_url=base_url, ressource=ressource)
 
-    def get_edge_params(self, edge_descriptor, **kwargs):
-        query_string_dict = self.extract_from_edge_descriptor(QUERY_STRING, edge_descriptor)
+    def get_endpoint_params(self, endpoint_descriptor, **kwargs):
+        query_string_dict = self.extract_from_endpoint_descriptor(QUERY_STRING, endpoint_descriptor)
         query_string = {}
         for key in query_string_dict:
             query_string_template = query_string_dict[key]
@@ -216,15 +216,15 @@ class YoutubeClient(object):
             query_string.update({"access_token": self.access_token})
         return query_string
 
-    def assert_valid_response(self, response, edge_descriptor, **kwargs):
+    def assert_valid_response(self, response, endpoint_descriptor, **kwargs):
         if response.status_code >= 400:
-            error_message = self.extract_error_message(response, edge_descriptor, **kwargs)
+            error_message = self.extract_error_message(response, endpoint_descriptor, **kwargs)
             raise Exception(error_message)
         return True
 
-    def extract_error_message(self, response, edge_descriptor, **kwargs):
+    def extract_error_message(self, response, endpoint_descriptor, **kwargs):
         response_error = self.get_error(response)
-        error_templates = self.extract_from_edge_descriptor(ON_RETURN, edge_descriptor)
+        error_templates = self.extract_from_endpoint_descriptor(ON_RETURN, endpoint_descriptor)
         error_template = error_templates.get(response.status_code, "Error: {}".format(response_error))
         error_message = self.format_template(error_template, **kwargs)
         return error_message
@@ -267,23 +267,23 @@ class YoutubeClient(object):
             template = ""
         return template
 
-    def get_params_dict(self, edge_descriptor):
-        query_string_template = edge_descriptor.get(QUERY_STRING, None)
+    def get_params_dict(self, endpoint_descriptor):
+        query_string_template = endpoint_descriptor.get(QUERY_STRING, None)
         if query_string_template is None:
             query_string_template = self.default_api[DEFAULT_DESCRIPTOR].get(QUERY_STRING)
         return query_string_template
 
-    def extract_from_edge_descriptor(self, item, edge_descriptor):
-        query_string_template = edge_descriptor.get(item, None)
+    def extract_from_endpoint_descriptor(self, item, endpoint_descriptor):
+        query_string_template = endpoint_descriptor.get(item, None)
         if query_string_template is None:
             query_string_template = self.default_api[DEFAULT_DESCRIPTOR].get(item)
         return query_string_template
 
-    def get_edge_descriptor(self, edge_name):
-        edge_descriptor = copy.deepcopy(self.default_api[DEFAULT_DESCRIPTOR])
-        if edge_name in self.default_api[EDGE_NAME]:
-            update_dict(edge_descriptor, self.default_api[EDGE_NAME][edge_name])
-        return edge_descriptor
+    def get_endpoint_descriptor(self, endpoint):
+        endpoint_descriptor = copy.deepcopy(self.default_api[DEFAULT_DESCRIPTOR])
+        if endpoint in self.default_api[ENDPOINT]:
+            update_dict(endpoint_descriptor, self.default_api[ENDPOINT][endpoint])
+        return endpoint_descriptor
 
     def expand(self, dictionary, key_to_expand):
         if key_to_expand in dictionary:
