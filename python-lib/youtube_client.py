@@ -10,7 +10,7 @@ ON_RETURN = "on_return"
 QUERY_STRING = "query_string"
 RECIPE_INPUT = "recipe_input"
 PARAMS = "query_string"
-COLUMN_FORMATING = "column_formating"
+COLUMN_FORMATTING = "column_formatting"
 COLUMN_CLEANING = "column_cleaning"
 COLUMN_EXPANDING = "column_expending"
 COLUMN_UNESCAPING = "column_unescaping"
@@ -33,31 +33,6 @@ youtube_api = {
         }
     },
     ENDPOINT: {
-        "playlists": {
-            RESOURCE: "{endpoint}",
-            QUERY_STRING: {
-                "channelId": CHANNEL_ID,
-                "id": PLAYLIST_ID,
-                "part": "{playlists_part}"
-            },
-            COLUMN_EXPANDING: ["contentDetails", "player", "snippet"]
-        },
-        "playlists_channelid": {
-            RESOURCE: "playlists",
-            QUERY_STRING: {
-                "channelId": CHANNEL_ID,
-                "part": "{playlists_part}"
-            },
-            COLUMN_EXPANDING: ["contentDetails", "player", "snippet"]
-        },
-        "videos": {
-            QUERY_STRING: {
-                "id": VIDEO_ID,
-                "part": "{videos_part}"
-            },
-            RECIPE_INPUT: "id",
-            COLUMN_EXPANDING: ["contentDetails", "player", "snippet", "status"]
-        },
         "channels": {
             QUERY_STRING: {
                 "categoryId": "{category_id}",
@@ -82,12 +57,18 @@ youtube_api = {
                 "part": "{commentThreads_part}",
                 "videoId": VIDEO_ID,
                 "channelId": CHANNEL_ID,
-                "allThreadsRelatedToChannelId": "{allThreadsRelatedToChannelId}",
+                "all_threads_related_to_channel_id": "{all_threads_related_to_channel_id}",
                 "id": COMMENT_ID
             },
             ITEM_ID_EQUIVALENT: VIDEO_ID,
             COLUMN_EXPANDING: ["snippet", "replies"],
             COLUMN_UNESCAPING: ["snippet_topLevelComment_snippet_textDisplay", "snippet_topLevelComment_snippet_textOriginal"]
+        },
+        "dss_recipe": {
+            QUERY_STRING: {
+                "part": "{dss_recipe_part}",
+                "id": "{id}"
+            }
         },
         "playlistItems": {
             QUERY_STRING: {
@@ -95,6 +76,23 @@ youtube_api = {
                 "playlistId": PLAYLIST_ID
             },
             COLUMN_EXPANDING: ["contentDetails", "snippet", "status"],
+        },
+        "playlists": {
+            RESOURCE: "{endpoint}",
+            QUERY_STRING: {
+                "channelId": CHANNEL_ID,
+                "id": PLAYLIST_ID,
+                "part": "{playlists_part}"
+            },
+            COLUMN_EXPANDING: ["contentDetails", "player", "snippet"]
+        },
+        "playlists_channelid": {
+            RESOURCE: "playlists",
+            QUERY_STRING: {
+                "channelId": CHANNEL_ID,
+                "part": "{playlists_part}"
+            },
+            COLUMN_EXPANDING: ["contentDetails", "player", "snippet"]
         },
         "subscriptions": {
             QUERY_STRING: {
@@ -108,11 +106,13 @@ youtube_api = {
             COLUMN_EXPANDING: ["contentDetails", "snippet", "subscriberSnippet"],
             COLUMN_UNESCAPING: ["snippet_description"]
         },
-        "dss_recipe": {
+        "videos": {
             QUERY_STRING: {
-                "part": "{dss_recipe_part}",
-                "id": "{id}"
-            }
+                "id": VIDEO_ID,
+                "part": "{videos_part}"
+            },
+            RECIPE_INPUT: "id",
+            COLUMN_EXPANDING: ["contentDetails", "player", "snippet", "status"]
         }
     }
 }
@@ -124,23 +124,27 @@ class YoutubeClient(object):
         self.config = config
         self.access_token = self.config.get("api-key")
         self.oauth_access_token = self.config.get("access_token")
-        self.next_page = {}
+        self.next_page = None
         self.default_api = youtube_api
-        self.formating = None
+        self.formatting = None
         self.expanding = None
         self.cleaning = None
+        self.unescaping = None
+        self.format = None
+        self.endpoint_descriptor = None
 
     def start_session(self, endpoint_descriptor):
-        self.formating = endpoint_descriptor.get(COLUMN_FORMATING, [])
+        self.formatting = endpoint_descriptor.get(COLUMN_FORMATTING, [])
         self.expanding = endpoint_descriptor.get(COLUMN_EXPANDING, [])
         self.unescaping = endpoint_descriptor.get(COLUMN_UNESCAPING, [])
         self.cleaning = endpoint_descriptor.get(COLUMN_CLEANING, [])
-        if self.formating == [] and self.expanding == [] and self.cleaning == []:
+        if self.formatting == [] and self.expanding == [] and self.cleaning == []:
             self.format = self.return_data
         else:
             self.format = self.format_data
 
-    def extract_args(self, **kwargs):
+    @staticmethod
+    def extract_args(**kwargs):
         extracted = {}
         for kwarg in kwargs:
             if isinstance(kwargs[kwarg], list):
@@ -169,14 +173,6 @@ class YoutubeClient(object):
         self.store_next_page(url, headers, params, json_response)
         return json_response.get("items", [])
 
-    def response_to_json(self, response, raise_exception=True):
-        content_type = response.headers.get('content-type', '')
-        if "application/json" in content_type.lower():
-            json_response = response.json()
-            return json_response
-        else:
-            return None
-
     def start_recipe_session(self, endpoint):
         self.endpoint_descriptor = self.get_endpoint_descriptor(endpoint)
 
@@ -199,9 +195,9 @@ class YoutubeClient(object):
 
     def get_endpoint_url(self, endpoint_descriptor, **kwargs):
         base_url_template = self.extract_from_endpoint_descriptor(API_URL, endpoint_descriptor)
-        ressource_template = self.extract_from_endpoint_descriptor(RESOURCE, endpoint_descriptor)
+        resource_template = self.extract_from_endpoint_descriptor(RESOURCE, endpoint_descriptor)
         base_url = self.format_template(base_url_template, **kwargs)
-        ressource = self.format_template(ressource_template, **kwargs)
+        ressource = self.format_template(resource_template, **kwargs)
         return "{base_url}{ressource}".format(base_url=base_url, ressource=ressource)
 
     def get_endpoint_params(self, endpoint_descriptor, **kwargs):
@@ -230,8 +226,8 @@ class YoutubeClient(object):
         return error_message
 
     def format_data(self, data):
-        for key in self.formating:
-            path = self.formating[key]
+        for key in self.formatting:
+            path = self.formatting[key]
             data[key] = self.extract(data, path)
         for key in self.expanding:
             data = self.expand(data, key)
@@ -241,6 +237,15 @@ class YoutubeClient(object):
         for key in self.cleaning:
             data.pop(key, None)
         return self.escape_json(data)
+
+    def extract(self, main_dict, path):
+        pointer = main_dict
+        for element in path:
+            if element in pointer:
+                pointer = pointer.get(element)
+            else:
+                return None
+        return pointer
 
     def return_data(self, data):
         return self.escape_json(data)
@@ -291,14 +296,15 @@ class YoutubeClient(object):
             dictionary.pop(key_to_expand, None)
         return dictionary
 
-    def dig(self, dictionary, element_to_expand, path_to_element):
-        if not isinstance(element_to_expand, dict):
-            dictionary["_".join(path_to_element)] = element_to_expand
+    def dig(self, dictionary, subkey_to_expand, path_to_subkey):
+        """Recurses into dict pointed by path_to_subkey until the key cointains something else then a dict."""
+        if not isinstance(subkey_to_expand, dict):
+            dictionary["_".join(path_to_subkey)] = subkey_to_expand
         else:
-            for key in element_to_expand:
-                new_path = copy.deepcopy(path_to_element)
+            for key in subkey_to_expand:
+                new_path = copy.deepcopy(path_to_subkey)
                 new_path.append(key)
-                self.dig(dictionary, element_to_expand[key], new_path)
+                self.dig(dictionary, subkey_to_expand[key], new_path)
 
     def get(self, url, headers=None, json=None, params={}):
         args = {}
@@ -319,15 +325,17 @@ class YoutubeClient(object):
     def store_next_page(self, url, headers, params, json_response):
         next_page_token = json_response.get("nextPageToken", None)
         if next_page_token is not None:
-            self.next_page["nextPageToken"] = next_page_token
-            self.next_page["url"] = url
-            self.next_page["headers"] = headers
-            self.next_page["params"] = params
+            self.next_page = {
+                "nextPageToken": next_page_token,
+                "url": url,
+                "headers": headers,
+                "params": params
+            }
         else:
             self.next_page = {}
 
     def has_next_page(self):
-        return self.next_page != {}
+        return self.next_page is None or self.next_page != {}
 
     def get_next_page(self):
         params = {}

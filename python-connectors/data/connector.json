@@ -306,7 +306,7 @@
             "visibilityCondition": "model.endpoint == 'comments'"
         },
         {
-            "name": "allThreadsRelatedToChannelId",
+            "name": "all_threads_related_to_channel_id",
             "label": "All threads related to Channel ID",
             "type": "STRING",
             "description": "",

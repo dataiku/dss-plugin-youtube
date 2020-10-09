@@ -8,7 +8,7 @@
     "kind": "PYTHON",
     "inputRoles": [
         {
-            "name": "input_A_role",
+            "name": "input_datasets_name",
             "label": "Dataset containing Youtube ids",
             "description": "",
             "arity": "UNARY",
@@ -20,8 +20,8 @@
     "outputRoles": [
         {
             "name": "youtube_output",
-            "label": "main output displayed name",
-            "description": "what main output means",
+            "label": "Dataset retrieving the Youtube data",
+            "description": "",
             "arity": "UNARY",
             "required": true,
             "acceptsDataset": true
@@ -308,7 +308,7 @@
                     "label": "Video ID"
                 },
                 {
-                    "value": "allThreadsRelatedToChannelId",
+                    "value": "all_threads_related_to_channel_id",
                     "label": "All related to channel ID"
                 },
                 {
@@ -317,7 +317,7 @@
                 },
                 {
                     "value": "channel_id",
-                    "label": "channel ID"
+                    "label": "Channel ID"
                 }
             ]
         },
