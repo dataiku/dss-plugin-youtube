@@ -1,0 +1,22 @@
+{
+    "meta" : {
+        "label": "Youtube API key",
+        "description": "",
+        "icon": "icon-youtube-play"
+    },
+
+    "defaultDefinableInline": true,
+
+    "defaultDefinableAtProjectLevel": true,
+
+    "pluginParams": [
+    ],
+
+    "params": [
+        {
+            "name": "api-key",
+            "label": "API key",
+            "type": "PASSWORD"
+        }
+    ]
+}

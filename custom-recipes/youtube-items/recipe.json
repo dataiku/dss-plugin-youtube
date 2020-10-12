@@ -1,0 +1,347 @@
+{
+    "meta": {
+        "label": "Youtube recipe",
+        "description": "Retrieve items from Youtube data API",
+        "icon": "icon-youtube-play",
+        "iconColor": "#FF0000"
+    },
+    "kind": "PYTHON",
+    "inputRoles": [
+        {
+            "name": "input_datasets_name",
+            "label": "Dataset containing Youtube ids",
+            "description": "",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+
+    "outputRoles": [
+        {
+            "name": "youtube_output",
+            "label": "Dataset retrieving the Youtube data",
+            "description": "",
+            "arity": "UNARY",
+            "required": true,
+            "acceptsDataset": true
+        }
+    ],
+    "params": [
+        {
+            "name": "access_type",
+            "label": "Access type",
+            "type": "SELECT",
+            "defaultValue": "token_access",
+            "selectChoices": [
+                {
+                    "value": "token_access",
+                    "label": "API Key"
+                },
+                {
+                    "value": "oauth_credentials",
+                    "label": "Google Single Sign On"
+                }
+            ]
+        },
+        {
+            "name": "token_access",
+            "label": "API key access",
+            "type": "PRESET",
+            "parameterSetId": "api-key",
+            "visibilityCondition": "model.access_type == 'token_access'"
+        },
+        {
+            "name": "oauth_credentials",
+            "label": "Google Single Sign On",
+            "type": "PRESET",
+            "parameterSetId": "oauth-credentials",
+            "visibilityCondition": "model.access_type == 'oauth_credentials'"
+        },
+        {
+            "name": "endpoint",
+            "label": "Item type",
+            "type": "SELECT",
+            "selectChoices": [
+                {
+                    "value": "playlists",
+                    "label": "Playlists"
+                },
+                {
+                    "value": "videos",
+                    "label": "Video"
+                },
+                {
+                    "value": "channels",
+                    "label": "Channels"
+                },
+                {
+                    "value": "comments",
+                    "label": "Comments"
+                },
+                {
+                    "value": "commentThreads",
+                    "label": "Comment threads"
+                },
+                {
+                    "value": "subscriptions",
+                    "label": "Subscriptions"
+                }
+            ]
+        },
+        {
+            "name": "playlists_part",
+            "label": "Parts",
+            "type": "MULTISELECT",
+            "visibilityCondition": "['playlists'].indexOf(model.endpoint) >= 0",
+            "selectChoices": [
+                {
+                    "value": "contentDetails",
+                    "label": "Content details"
+                },
+                {
+                    "value": "id",
+                    "label": "ID"
+                },
+                {
+                    "value": "localizations",
+                    "label": "Localizations"
+                },
+                {
+                    "value": "player",
+                    "label": "Player"
+                },
+                {
+                    "value": "snippet",
+                    "label": "Snippet"
+                },
+                {
+                    "value": "status",
+                    "label": "Status"
+                }
+            ]
+        },
+        {
+            "name": "videos_part",
+            "label": "Parts",
+            "type": "MULTISELECT",
+            "visibilityCondition": "['videos'].indexOf(model.endpoint) >= 0",
+            "selectChoices": [
+                {
+                    "value": "contentDetails",
+                    "label": "Content details"
+                },
+                {
+                    "value": "id",
+                    "label": "ID"
+                },
+                {
+                    "value": "localizations",
+                    "label": "Localizations"
+                },
+                {
+                    "value": "player",
+                    "label": "Player"
+                },
+                {
+                    "value": "snippet",
+                    "label": "Snippet"
+                },
+                {
+                    "value": "status",
+                    "label": "Status"
+                }
+            ]
+        },
+        {
+            "name": "channels_part",
+            "label": "Parts",
+            "type": "MULTISELECT",
+            "visibilityCondition": "model.endpoint == 'channels'",
+            "selectChoices": [
+                {
+                    "value": "auditDetails",
+                    "label": "Audit details"
+                },
+                {
+                    "value": "brandingSettings",
+                    "label": "Branding settings"
+                },
+                {
+                    "value": "contentDetails",
+                    "label": "Content details"
+                },
+                {
+                    "value": "contentOwnerDetails",
+                    "label": "Content owner details"
+                },
+                {
+                    "value": "id",
+                    "label": "ID"
+                },
+                {
+                    "value": "invideoPromotion",
+                    "label": "In video promotion"
+                },
+                {
+                    "value": "localizations",
+                    "label": "Localizations"
+                },
+                {
+                    "value": "snippet",
+                    "label": "Snippet"
+                },
+                {
+                    "value": "statistics",
+                    "label": "Statistics"
+                },
+                {
+                    "value": "status",
+                    "label": "Status"
+                },
+                {
+                    "value": "topicDetails",
+                    "label": "Topic details"
+                }
+            ]
+        },
+        {
+            "name": "comments_part",
+            "label": "Parts",
+            "type": "MULTISELECT",
+            "visibilityCondition": "['comments'].indexOf(model.endpoint) >= 0",
+            "selectChoices": [
+                {
+                    "value": "id",
+                    "label": "ID"
+                },
+                {
+                    "value": "snippet",
+                    "label": "Snippet"
+                }
+            ]
+        },
+        {
+            "name": "commentThreads_part",
+            "label": "Parts",
+            "type": "MULTISELECT",
+            "visibilityCondition": "['commentThreads'].indexOf(model.endpoint) >= 0",
+            "selectChoices": [
+                {
+                    "value": "id",
+                    "label": "ID"
+                },
+                {
+                    "value": "snippet",
+                    "label": "Snippet"
+                },
+                {
+                    "value": "replies",
+                    "label": "Replies"
+                }
+            ]
+        },
+        {
+            "name": "subscriptions_part",
+            "label": "Parts",
+            "type": "MULTISELECT",
+            "visibilityCondition": "['subscriptions'].indexOf(model.endpoint) >= 0",
+            "selectChoices": [
+                {
+                    "value": "contentDetails",
+                    "label": "Content details"
+                },
+                {
+                    "value": "id",
+                    "label": "ID"
+                },
+                {
+                    "value": "snippet",
+                    "label": "Snippet"
+                },
+                {
+                    "value": "subscriberSnippet",
+                    "label": "Subscriber snippet"
+                }
+            ]
+        },
+        {
+            "name": "id_type",
+            "label": "ID type",
+            "type": "SELECT",
+            "visibilityCondition": "model.endpoint == 'comments'",
+            "selectChoices": [
+                {
+                    "value": "comment_id",
+                    "label": "Comment ID"
+                },
+                {
+                    "value": "parentId",
+                    "label": "Parent ID"
+                }
+            ]
+        },
+        {
+            "name": "id_type",
+            "label": "ID type",
+            "type": "SELECT",
+            "visibilityCondition": "model.endpoint == 'playlists'",
+            "selectChoices": [
+                {
+                    "value": "channel_id",
+                    "label": "Channel ID"
+                },
+                {
+                    "value": "playlist_id",
+                    "label": "Playlist ID"
+                }
+            ]
+        },
+        {
+            "name": "id_type",
+            "label": "ID type",
+            "type": "SELECT",
+            "visibilityCondition": "model.endpoint == 'commentThreads'",
+            "selectChoices": [
+                {
+                    "value": "video_id",
+                    "label": "Video ID"
+                },
+                {
+                    "value": "all_threads_related_to_channel_id",
+                    "label": "All related to channel ID"
+                },
+                {
+                    "value": "comment_id",
+                    "label": "Comment ID"
+                },
+                {
+                    "value": "channel_id",
+                    "label": "Channel ID"
+                }
+            ]
+        },
+        {
+            "name": "id_type",
+            "label": "ID type",
+            "type": "SELECT",
+            "visibilityCondition": "model.endpoint == 'videos'",
+            "selectChoices": [
+                {
+                    "value": "video_id",
+                    "label": "Video ID"
+                }
+            ]
+        },
+        {
+            "name": "id_column_name",
+            "label": "ID's column name",
+            "type": "STRING",
+            "description": "Name of the column containing the IDs to process",
+            "defaultValue": "",
+            "mandatory": true,
+            "visibilityCondition": "['commentThreads', 'channels', 'playlists', 'videos', 'comments', 'subscriptions'].indexOf(model.endpoint) >= 0"
+        }
+    ],
+    "resourceKeys": []
+}

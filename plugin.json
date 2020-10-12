@@ -1,0 +1,13 @@
+{
+    "id": "youtube",
+    "version": "1.0.0",
+    "meta": {
+        "label": "Youtube",
+        "description": "",
+        "author": "Dataiku (Alex Bourret)",
+        "icon": "icon-youtube-play",
+        "tags": ["Connector", "Recipe", "Cloud"],
+        "url": "https://www.dataiku.com/product/plugins/youtube/",
+        "licenseInfo": "Apache Software License"
+    }
+}
