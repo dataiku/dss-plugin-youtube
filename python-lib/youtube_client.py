@@ -1,6 +1,7 @@
 import requests
 import copy
 import json
+import logging
 
 API_URL = "api"
 CHANNEL_ID = "{channel_id}"
@@ -116,6 +117,10 @@ youtube_api = {
         }
     }
 }
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO,
+                    format='youtube plugin %(levelname)s - %(message)s')
 
 
 class YoutubeClient(object):
@@ -262,7 +267,8 @@ class YoutubeClient(object):
             json_response = json_response.get("error", json_response)
             json_response = json_response.get("message", json_response)
             return json_response
-        except Exception:
+        except Exception as err:
+            logger.warn("Error while parsing the response's json: {}".format(err))
             return response.text
 
     def format_template(self, template, **kwargs):
