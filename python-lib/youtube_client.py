@@ -2,25 +2,25 @@ import requests
 import copy
 import json
 
-DEFAULT_DESCRIPTOR = "default"
-ENDPOINT = "endpoint"
-RESOURCE = "resource_name"
 API_URL = "api"
-ON_RETURN = "on_return"
-QUERY_STRING = "query_string"
-RECIPE_INPUT = "recipe_input"
-PARAMS = "query_string"
-COLUMN_FORMATTING = "column_formatting"
+CHANNEL_ID = "{channel_id}"
 COLUMN_CLEANING = "column_cleaning"
 COLUMN_EXPANDING = "column_expending"
+COLUMN_FORMATTING = "column_formatting"
 COLUMN_UNESCAPING = "column_unescaping"
-CHANNEL_ID = "{channel_id}"
-PART = "{part}"
-VIDEO_ID = "{video_id}"
 COMMENT_ID = "{comment_id}"
-PLAYLIST_ID = "{playlist_id}"
-SUBSCRIPTION_ID = "{subscription_id}"
+DEFAULT_DESCRIPTOR = "default"
+ENDPOINT = "endpoint"
 ITEM_ID_EQUIVALENT = "item_id_equivalent"
+ON_RETURN = "on_return"
+PARAMS = "query_string"
+PART = "{part}"
+PLAYLIST_ID = "{playlist_id}"
+QUERY_STRING = "query_string"
+RECIPE_INPUT = "recipe_input"
+RESOURCE = "resource_name"
+SUBSCRIPTION_ID = "{subscription_id}"
+VIDEO_ID = "{video_id}"
 
 youtube_api = {
     DEFAULT_DESCRIPTOR: {
@@ -297,7 +297,7 @@ class YoutubeClient(object):
         return dictionary
 
     def dig(self, dictionary, subkey_to_expand, path_to_subkey):
-        """Recurses into dict pointed by path_to_subkey until the key cointains something else then a dict."""
+        """Recurses into dict pointed by path_to_subkey until the key contains something else then a dict."""
         if not isinstance(subkey_to_expand, dict):
             dictionary["_".join(path_to_subkey)] = subkey_to_expand
         else:
