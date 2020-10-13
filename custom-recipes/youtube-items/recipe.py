@@ -29,8 +29,7 @@ args = {
 }
 item_id_equivalent = id_type if id_type != "" else client.get_item_id_equivalent(endpoint)
 for index, row in id_list_df.iterrows():
-    id = row[id_column_name]
-    args[item_id_equivalent] = id
+    args[item_id_equivalent] = row[id_column_name]
     data = client.get_endpoint(raise_exception=False, **args)
     while client.has_data_to_process():
         for result in data:

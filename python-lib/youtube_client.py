@@ -2,6 +2,7 @@ import requests
 import copy
 import json
 import logging
+import re
 
 API_URL = "api"
 CHANNEL_ID = "{channel_id}"
@@ -274,11 +275,12 @@ class YoutubeClient(object):
             return response.text
 
     def format_template(self, template, **kwargs):
-        try:
-            template = template.format(**kwargs)
-        except KeyError:
-            template = ""
-        return template
+        placeholders = re.findall(r'{([a-zA-Z\-\_]*)}', template)
+        formated = template
+        for placeholder in placeholders:
+            replacement = kwargs.get(placeholder, "")
+            formated = formated.replace("{{{}}}".format(placeholder), str(replacement))
+        return formated
 
     def get_params_dict(self, endpoint_descriptor):
         query_string_template = endpoint_descriptor.get(QUERY_STRING, None)
@@ -350,7 +352,7 @@ class YoutubeClient(object):
             return self.has_next_page()
 
     def has_next_page(self):
-        return self.next_page is None or self.next_page != {}
+        return self.next_page is not None and self.next_page != {}
 
     def get_next_page(self):
         params = {}
