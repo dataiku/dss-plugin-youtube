@@ -32,16 +32,11 @@ for index, row in id_list_df.iterrows():
     id = row[id_column_name]
     args[item_id_equivalent] = id
     data = client.get_endpoint(raise_exception=False, **args)
-    #while len(data) > 0:
-    while client.has_next_page():
+    while client.has_data_to_process():
         for result in data:
             result = client.format_data(result)
             results.append(result)
         data = client.get_next_page()
-        # if client.has_next_page():
-        #     data = client.get_next_page()
-        # else:
-        #     break
 output_names_stats = get_output_names_for_role('youtube_output')
 odf = pd.DataFrame(results)
 

@@ -137,6 +137,7 @@ class YoutubeClient(object):
         self.unescaping = None
         self.format = None
         self.endpoint_descriptor = None
+        self.initial_data_process_loop = None
 
     def start_session(self, endpoint_descriptor):
         self.formatting = endpoint_descriptor.get(COLUMN_FORMATTING, [])
@@ -176,6 +177,7 @@ class YoutubeClient(object):
                 error_message = self.extract_error_message(response, endpoint_descriptor, **kwargs)
                 json_response = {"items": [{"error": error_message}]}
         self.store_next_page(url, headers, params, json_response)
+        self.initial_data_process_loop = True
         return json_response.get("items", [])
 
     def start_recipe_session(self, endpoint):
@@ -274,7 +276,7 @@ class YoutubeClient(object):
     def format_template(self, template, **kwargs):
         try:
             template = template.format(**kwargs)
-        except KeyError as key:  # This has to go
+        except KeyError:
             template = ""
         return template
 
@@ -340,12 +342,21 @@ class YoutubeClient(object):
         else:
             self.next_page = {}
 
+    def has_data_to_process(self):
+        if self.initial_data_process_loop:
+            self.initial_data_process_loop = False
+            return True
+        else:
+            return self.has_next_page()
+
     def has_next_page(self):
         return self.next_page is None or self.next_page != {}
 
     def get_next_page(self):
         params = {}
-        params = self.next_page["params"]
+        params = self.next_page.get("params")
+        if params is None:
+            return []
         params["pageToken"] = self.next_page["nextPageToken"]
         json_response = self.get(self.next_page["url"], headers=self.next_page["headers"], params=params)
         data = json_response.get("items", [])
