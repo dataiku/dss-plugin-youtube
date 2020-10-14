@@ -25,7 +25,7 @@ class YoutubeDataAPIConnector(Connector):
     def generate_rows(self, dataset_schema=None, dataset_partitioning=None,
                       partition_id=None, records_limit=-1):
         json_response = self.client.get_endpoint(**self.args)
-        while self.client.has_next_page():
+        while self.client.has_data_to_process():
             for item in json_response:
                 yield self.client.format_data(item)
             json_response = self.client.get_next_page()
