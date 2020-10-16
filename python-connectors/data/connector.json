@@ -322,6 +322,13 @@
             "defaultValue": "",
             "mandatory": false,
             "visibilityCondition": "['subscriptions'].indexOf(model.endpoint) >= 0"
+        },
+        {
+            "name": "maximum_items",
+            "label": "Maximum number of items",
+            "type": "INT",
+            "description": "-1 for no limit",
+            "defaultValue": 1000
         }
     ]
 }
