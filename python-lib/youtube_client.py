@@ -344,6 +344,17 @@ class YoutubeClient(object):
         else:
             return self.has_next_page()
 
+    def set_item_number_limit(self, max_item_number):
+        self.max_item_number = max_item_number
+
+    def has_remaining_data(self, nb_items):
+        if self.max_item_number == -1:
+            return self.has_data_to_process()
+        elif nb_items >= self.max_item_number:
+            return False
+        else:
+            return self.has_data_to_process()
+
     def has_next_page(self):
         return self.next_page is not None and self.next_page != {}
 
