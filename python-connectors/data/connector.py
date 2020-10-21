@@ -16,6 +16,7 @@ class YoutubeDataAPIConnector(Connector):
         self.part = ",".join(self.config.get("part", []))
         self.endpoint = self.config.get("endpoint", None)
         self.args = self.client.extract_args(**config)
+        self.maximum_items = self.config.get("maximum_items", 1000)
 
     def get_read_schema(self):
         # In this example, we don't specify a schema here, so DSS will infer the schema
@@ -24,11 +25,21 @@ class YoutubeDataAPIConnector(Connector):
 
     def generate_rows(self, dataset_schema=None, dataset_partitioning=None,
                       partition_id=None, records_limit=-1):
+        nb_items = 0
+        maximum_items = records_limit if self.maximum_items == -1 else min([records_limit, self.maximum_items])
         json_response = self.client.get_endpoint(**self.args)
         while self.client.has_data_to_process():
             for item in json_response:
                 yield self.client.format_data(item)
+                nb_items = nb_items + 1
+                if maximum_items > -1 and nb_items >= maximum_items:
+                    return
             json_response = self.client.get_next_page()
+
+    def get_maximum_items(self, dss_records_limit, user_records_limit):
+        if user_records_limit == -1:
+            return dss_records_limit
+        return min([dss_records_limit, user_records_limit])
 
     def get_writer(self, dataset_schema=None, dataset_partitioning=None,
                    partition_id=None):

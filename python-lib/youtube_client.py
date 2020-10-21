@@ -184,13 +184,6 @@ class YoutubeClient(object):
     def start_recipe_session(self, endpoint):
         self.endpoint_descriptor = self.get_endpoint_descriptor(endpoint)
 
-    def get_endpoint_from_recipe(self, **kwargs):
-        url = self.get_endpoint_url(self.endpoint_descriptor, **kwargs)
-        headers = self.get_headers()
-        params = self.get_endpoint_params(self.get_endpoint_descriptor("dss_recipe"), **kwargs)
-        response = requests.get(url, params=params, headers=headers)
-        self.assert_valid_response(response, self.endpoint_descriptor, **kwargs)
-
     def get_headers(self):
         headers = {}
         if self.oauth_access_token is not None:
@@ -217,7 +210,7 @@ class YoutubeClient(object):
             if query_string_value is not None and query_string_value != "" and query_string_value != "[]":
                 query_string.update({key: query_string_value})
         if self.access_token is not None:
-            query_string.update({"access_token": self.access_token})
+            query_string.update({"key": self.access_token})
         return query_string
 
     def assert_valid_response(self, response, endpoint_descriptor, **kwargs):
@@ -350,6 +343,17 @@ class YoutubeClient(object):
             return True
         else:
             return self.has_next_page()
+
+    def set_item_number_limit(self, max_item_number):
+        self.max_item_number = max_item_number
+
+    def has_remaining_data(self, nb_items):
+        if self.max_item_number == -1:
+            return self.has_data_to_process()
+        elif nb_items >= self.max_item_number:
+            return False
+        else:
+            return self.has_data_to_process()
 
     def has_next_page(self):
         return self.next_page is not None and self.next_page != {}
