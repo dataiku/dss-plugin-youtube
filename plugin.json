@@ -1,9 +1,9 @@
 {
     "id": "youtube",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "meta": {
         "label": "Youtube",
-        "description": "",
+        "description": "Import data from your Youtube account",
         "author": "Dataiku (Alex Bourret)",
         "icon": "icon-youtube-play",
         "tags": ["Connector", "Recipe", "Cloud"],
